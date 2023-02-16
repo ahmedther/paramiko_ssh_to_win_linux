@@ -51,7 +51,11 @@ class RemoteConnection:
                 local_mod_time = os.path.getmtime(local_entry_path)
                 if local_entry not in remote_entries:
                     sftp = self.ssh.open_sftp()
-                    sftp.put(local_entry_path, remote_entry_path)
+                    try:
+                        sftp.put(local_entry_path, remote_entry_path)
+                    except:
+                        print(f"Skipped {local_entry_path} to {remote_entry_path}")
+
                     print(f"Copying to {remote_entry_path}")
                     sftp.close()
 
@@ -72,7 +76,10 @@ class RemoteConnection:
 
                     if local_mod_time > remote_mod_time:
                         sftp = self.ssh.open_sftp()
-                        sftp.put(local_entry_path, remote_entry_path)
+                        try:
+                            sftp.put(local_entry_path, remote_entry_path)
+                        except:
+                            print(f"Skipped {local_entry_path} to {remote_entry_path}")
                         print(f"Overwriting to {remote_entry_path}")
                         sftp.close()
 
@@ -135,6 +142,22 @@ class RemoteConnection:
         for commands in itertools.islice(command_lists, 0, len(command_lists)):
             self.run_ssh_command_on_server(
                 f"echo 'ahmed' | {commands}",
+                remote_entry_path=None,
+                type=1,
+            )
+
+    def windows_restart_services(self):
+        command_lists = [
+            "NET STOP Query_Report_Portal",
+            'NET STOP "UHID Card Generator Website"',
+            "NET STOP nginx",
+            "NET START Query_Report_Portal",
+            'NET START "UHID Card Generator Website"',
+            "NET START nginx",
+        ]
+        for commands in itertools.islice(command_lists, 0, len(command_lists)):
+            self.run_ssh_command_on_server(
+                commands,
                 remote_entry_path=None,
                 type=1,
             )

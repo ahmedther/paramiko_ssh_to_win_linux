@@ -8,9 +8,9 @@ linux_portal_path = r"/home/ahmed/Desktop/AHMED/Django_Websites/reports_portal/P
 window_portal_path = r"C:\AhmedWebsites\report_portal\Scripts\Portal"
 
 
-################################################################
+###############################################################
 # Linux Server Connnection
-################################################################
+###############################################################
 
 linconn = RemoteConnection(
     ip="172.20.100.81", username="ahmed", password="ahmed", os_type="linux"
@@ -46,12 +46,12 @@ winconn.copy_files_to_server(
 )
 
 winconn.run_ssh_command_on_server(
-    f"cd {window_portal_path} && dir",
+    f"cd {window_portal_path}/web_excel_files && del /q * && dir",
     remote_entry_path=None,
     type=1,
 )
 
-
+winconn.windows_restart_services()
 
 winconn.close_connection()
 
